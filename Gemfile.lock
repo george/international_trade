@@ -1,0 +1,12 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    fastercsv (1.5.4)
+    slop (1.2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  fastercsv
+  slop
