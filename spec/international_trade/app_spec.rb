@@ -47,9 +47,12 @@ module InternationalTrade
     end
 
     describe "#transactions" do
-      before { run_app }
-      it "includes transactions for the sales 'sku' in question" do
+      before { run_app(nil, '--sku DM1182') }
+      it "include transactions for the sales 'sku' in question" do
         @app.transactions.size.should == 3 # sanity check
+        @app.transactions.each do |txn|
+          txn.sku.should == 'DM1182'
+        end
       end
     end
 
