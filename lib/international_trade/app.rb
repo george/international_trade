@@ -19,17 +19,11 @@ module InternationalTrade
   class App
     attr_accessor :options, :transactions
 
-    DEFAULT_SKU = 'DM1182'
+    DEFAULT_SKU             = 'DM1182'
     DEFAULT_TARGET_CURRENCY = 'USD'
 
     def initialize(arguments, stdin)
       @arguments = arguments
-
-      # default options
-      @options = OpenStruct.new
-      @options.sku = DEFAULT_SKU
-      @options.target_currency = DEFAULT_TARGET_CURRENCY
-
       @transactions = []
     end
 
@@ -50,39 +44,28 @@ module InternationalTrade
       end
     end
 
-    def parse_options
-      @optparse = OptionParser.new do |opts|
-        opts.banner = "Usage:", "\n    ./international_trade [options] data/TRANS.csv data/RATES.xml"
-        opts.separator ""
-        opts.separator "Options:"
+    # workaround until https://github.com/injekt/slop/pull/15 is accepted
+    def _parse_options(strict = true)
+      @options = Slop.parse!(@arguments, :help => true, :strict => strict) do
+        banner "Usage:\n\t./international_trade [options] data/TRANS.csv data/RATES.xml\n\nOptions:"
 
-        # opts.on( '-s', '--sku [SKU]', "Item for which we compute the grand total of sales (default: #{DEFAULT_SKU})" ) do |f|
-        #   @options.sku = f.strip
-        # end
-        #
-        opts.on( '-s', '--sku [SKU]', "Item for which we compute the grand total of sales (default: #{DEFAULT_SKU})" ) do |sku|
-          @options.sku = sku.strip
-        end
-
-        opts.on( '-c', '--currency [CURRENCY]', "Sets the target currency for output (default: #{DEFAULT_TARGET_CURRENCY})" ) do |currency|
-          @options.target_currency = currency.strip
-        end
-
-        opts.on_tail("-h", "--help", "Show this message") do
-          puts opts
-          exit
-        end
+        on :s, :sku,             "Item for which we compute the grand total of sales (default: #{DEFAULT_SKU})", :optional => true, :default => DEFAULT_SKU
+        on :c, :target_currency, "Sets the target currency for output (default: #{DEFAULT_TARGET_CURRENCY})",    :optional => true, :default => DEFAULT_TARGET_CURRENCY
       end
+    end
 
-      @optparse.parse!(@arguments)
-
-    rescue OptionParser::InvalidOption => e
+    def parse_options
+      _parse_options
+    rescue Slop::InvalidOptionError => e
+      _parse_options(false)
+      display_usage_and_exit(e.message)
+    rescue Slop::MissingArgumentError => e
       display_usage_and_exit(e.message)
     end
 
     def verify_data_files
       @transaction_file    = @arguments.detect { |path| File.extname(path).downcase == '.csv' }
-      @exchange_data_file = @arguments.detect { |path| File.extname(path).downcase == '.xml' }
+      @exchange_data_file  = @arguments.detect { |path| File.extname(path).downcase == '.xml' }
 
       errors = []
       errors << "File containing sales data (#{@transaction_file}) does not exist" unless file_exists?(@transaction_file)
@@ -98,12 +81,12 @@ module InternationalTrade
     end
 
     def process_transactions
-      @transactions = TransactionParser.parse(@transaction_file, @options.sku)
+      @transactions = TransactionParser.parse(@transaction_file, @options['sku'])
     end
 
     def display_usage_and_exit(error_message = nil)
       puts "\n#{error_message}\n\n" if error_message
-      puts @optparse
+      puts @options
       exit
     end
 

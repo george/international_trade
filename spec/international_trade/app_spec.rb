@@ -5,55 +5,51 @@ module InternationalTrade
 
     def run_app(arguments = nil, options = nil)
       arguments ||= %w(data/SAMPLE_TRANS.csv data/SAMPLE_RATES.xml)
-      arguments << options if options
+      arguments += options.split if options
 
       @app = App.new(arguments, nil)
       @app.run
-      @app
     end
-
-    before { @app = run_app }
 
     describe "the sales 'sku' in question" do
       it "defaults to 'DM1182'" do
         run_app
-        @app.options.sku.should == 'DM1182'
+        @app.options['sku'].should == 'DM1182'
       end
 
       it "may be passed as an option using the '-s' switch" do
         run_app(nil, '-s XXX123')
-        @app.options.sku.should == 'XXX123'
+        @app.options['sku'].should == 'XXX123'
       end
 
       it "may be passed as an option using the '--sku' switch" do
-        pending "I figure out why long-form options aren't being parsed"
         run_app(nil, '--sku YYY789')
-        @app.options.sku.should == 'YYY789'
+        @app.options['sku'].should == 'YYY789'
       end
     end
 
     describe "the target currency" do
       it "defaults to 'USD'" do
         run_app
-        @app.options.target_currency.should == 'USD'
+        @app.options['target_currency'].should == 'USD'
       end
 
       it "may be passed as an option using the '-c' switch" do
         run_app(nil, '-c XKCD')
-        @app.options.target_currency.should == 'XKCD'
+        @app.options['target_currency'].should == 'XKCD'
       end
 
-      it "may be passed as an option using the '--currency' switch" do
-        pending "I figure out why long-form options aren't being parsed"
-        run_app(nil, '--currency XYZPDQ')
-        @app.options.target_currency.should == 'XYZPDQ'
+      it "may be passed as an option using the '--target_currency' switch" do
+        run_app(nil, '--target_currency XYZPDQ')
+        @app.options['target_currency'].should == 'XYZPDQ'
       end
 
     end
 
     describe "#transactions" do
+      before { run_app }
       it "includes transactions for the sales 'sku' in question" do
-        @app.transactions.size.should == 3
+        @app.transactions.size.should == 3 # sanity check
       end
     end
 

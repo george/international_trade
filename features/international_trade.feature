@@ -23,7 +23,7 @@ Feature: International trade
     When I run "international_trade -x RATES.xml"
     Then the output should contain:
       """
-      invalid option: -x
+      Unknown option -- 'x'
       """
     And the output should contain usage information
 
