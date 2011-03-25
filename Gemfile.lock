@@ -39,6 +39,7 @@ GEM
       linecache (>= 0.3)
     slop (1.2.0)
     term-ansicolor (1.0.5)
+    xml-simple (1.0.15)
 
 PLATFORMS
   ruby
@@ -50,3 +51,4 @@ DEPENDENCIES
   rspec
   ruby-debug
   slop
+  xml-simple

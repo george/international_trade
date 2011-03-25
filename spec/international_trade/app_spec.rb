@@ -35,13 +35,13 @@ module InternationalTrade
       end
 
       it "may be passed as an option using the '-c' switch" do
-        run_app(nil, '-c XKCD')
-        @app.options['target_currency'].should == 'XKCD'
+        run_app(nil, '-c CAD')
+        @app.options['target_currency'].should == 'CAD'
       end
 
       it "may be passed as an option using the '--target_currency' switch" do
-        run_app(nil, '--target_currency XYZPDQ')
-        @app.options['target_currency'].should == 'XYZPDQ'
+        run_app(nil, '--target_currency CAD')
+        @app.options['target_currency'].should == 'CAD'
       end
 
     end

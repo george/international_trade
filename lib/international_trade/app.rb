@@ -39,9 +39,25 @@ module InternationalTrade
     #######
 
     def calculate_total
-      @transactions.inject(0.0) do |total, txn|
-        # total +=
+      result = @transactions.inject(0.0) do |total, txn|
+        total += @currency_converter.convert(txn.amount)
       end
+
+      puts result
+    end
+
+    def display_usage_and_exit(error_message = nil)
+      puts "\n#{error_message}\n\n" if error_message
+      puts @options
+      exit
+    end
+
+    def file_exists?(filepath)
+      filepath && File.exists?(filepath)
+    end
+
+    def initialize_currency_converter
+      @currency_converter = CurrencyConverter.new(@exchange_data_file, @options['target_currency'])
     end
 
     # workaround until https://github.com/injekt/slop/pull/15 is accepted
@@ -63,6 +79,17 @@ module InternationalTrade
       display_usage_and_exit(e.message)
     end
 
+    # Setup the arguments
+    def process_arguments
+      process_transactions
+      initialize_currency_converter
+      calculate_total
+    end
+
+    def process_transactions
+      @transactions = TransactionParser.parse(@transaction_file, @options['sku'])
+    end
+
     def verify_data_files
       @transaction_file    = @arguments.detect { |path| File.extname(path).downcase == '.csv' }
       @exchange_data_file  = @arguments.detect { |path| File.extname(path).downcase == '.xml' }
@@ -72,26 +99,6 @@ module InternationalTrade
       errors << "File file containing the conversion rates (#{@exchange_data_file}) does not exist" unless file_exists?(@exchange_data_file)
 
       display_usage_and_exit(errors.join("\n")) unless errors.empty?
-    end
-
-    # Setup the arguments
-    def process_arguments
-      process_transactions
-      calculate_total
-    end
-
-    def process_transactions
-      @transactions = TransactionParser.parse(@transaction_file, @options['sku'])
-    end
-
-    def display_usage_and_exit(error_message = nil)
-      puts "\n#{error_message}\n\n" if error_message
-      puts @options
-      exit
-    end
-
-    def file_exists?(filepath)
-      filepath && File.exists?(filepath)
     end
   end
 end
