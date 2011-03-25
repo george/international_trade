@@ -33,31 +33,5 @@ module InternationalTrade
 
 
     end
-    # subject { TransactionParser.new('data/SAMPLE_TRANS.csv', 'DM1182') }
-    #
-    # it "responds to :filepath" do
-    #   subject.filepath.should == 'data/SAMPLE_TRANS.csv'
-    # end
-    #
-    # it "knows how many transactions it has" do
-    #   subject.transactions.size.should == 5
-    # end
-    #
-    # describe "an individual transaction" do
-    #   subject { sales.transactions.first }
-    #   let(:sales) { TransactionParser.new('data/SAMPLE_TRANS.csv') }
-    #
-    #   it "responds to :store" do
-    #     subject.store.should == 'Yonkers'
-    #   end
-    #
-    #   it "responds to :sku" do
-    #     subject.sku.should == 'DM1210'
-    #   end
-    #
-    #   it "responds to :amount" do
-    #     subject.amount.should == '70.00 USD'
-    #   end
-    # end
   end
 end
