@@ -4,8 +4,8 @@ require 'big_decimal_extension'
 
 describe BigDecimal do
   describe "#banker_round" do
-    def rounded(number, scale = 2)
-      BigDecimal(number.to_s).banker_round(scale).to_s('F')
+    def rounded(number)
+      BigDecimal(number.to_s).banker_round.to_s('F')
     end
 
     context "with scale of 2" do

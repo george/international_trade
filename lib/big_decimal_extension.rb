@@ -4,7 +4,7 @@ require 'bigdecimal'
 # after multiple failed attempts at my own implementation
 
 module BigDecimalExtension
-  def banker_round(decimals = 0)
+  def banker_round(decimals = 2)
     return BigDecimal( (_round(self * (10**decimals))/((10**decimals).to_f)).to_s )
   end
 

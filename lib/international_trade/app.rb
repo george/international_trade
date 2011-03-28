@@ -6,9 +6,6 @@
 #
 #   For help use: ./international_trade -h
 #
-# == Options
-#   -h, --help          Displays help message
-#
 # == Author
 #   George Anderson
 #   george@benevolentcode.com
@@ -43,7 +40,7 @@ module InternationalTrade
         total += @currency_converter.convert(txn.amount)
       end
 
-      puts result
+      puts "\nRESULT: #{result} #{@options['target_currency']}\n\n"
     end
 
     def display_usage_and_exit(error_message = nil)
