@@ -5,7 +5,7 @@ require 'xmlsimple'
 
 module InternationalTrade
   class CurrencyConverter
-    attr_reader :cost, :exchange_data_file, :rates, :target_currency, :cached_conversion_rates
+    attr_reader :cached_conversion_rates, :cost, :exchange_data_file, :rates, :target_currency
     attr_accessor :constituent_conversion_rates
 
     def initialize(exchange_data_file, target_currency)
@@ -43,15 +43,14 @@ module InternationalTrade
       @cached_conversion_rates[from_currency.to_sym] = conversion_rate
     end
 
+    # here's where we do the heavy lifting;
+    # also the single method of which I am most proud :)
     def composite_conversion_rate(from_currency)
       if exact_match = self.rates.detect{ |r| r.from == from_currency && r.to == self.target_currency }
         return exact_match.conversion
       end
 
-      sub_domain = self.rates.find_all{ |r| r.from == from_currency }
-
-      sub_domain.each do |rate|
-
+      self.rates.find_all{ |r| r.from == from_currency }.each do |rate|
         self.rates.delete_if{ |r| r == rate || ( r.to == rate.from && r.from == rate.to ) } # no back-tracking
 
         if conversion = composite_conversion_rate(rate.to)
@@ -63,31 +62,21 @@ module InternationalTrade
 
     def parse_exchange_data_file
       @rates = _parse_exchange_data_file
-      post_process_rates
+      post_process_conversion_rates
     end
 
-    def post_process_rates
-      begin
-        @rates = @rates.collect do |rate|
-          # Float-ify conversion rates for cleaner code (later)
-          rate['conversion'] = BigDecimal(rate['conversion'], 15)
-          # normalize currency casing
-          %w(from to).each{ |x| rate[x] = rate[x].upcase}
-          rate
-        end
+    def post_process_conversion_rates
+      @rates = @rates.collect do |rate|
+        # Float-ify conversion rates for cleaner code (later)
+        rate['conversion'] = BigDecimal(rate['conversion'], 15)
 
-        # convert the conversions to OpenStructs (mainly so we
-        # can use symbol to proc later)
-        @rates = rates.collect{ |rate| OpenStruct.new(rate)}
-      rescue Exception => e
-        raise <<-EOS
-
-        #{@rates.inspect}
-
-        #{e}
-
-        EOS
+        # normalize currency casing
+        %w(from to).each{ |x| rate[x] = rate[x].upcase}
+        rate
       end
+
+      # convert the conversions to OpenStructs, as they're nicer to work with
+      @rates = rates.collect{ |rate| OpenStruct.new(rate)}
     end
 
     def _parse_exchange_data_file
