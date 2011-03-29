@@ -6,7 +6,6 @@ require 'xmlsimple'
 module InternationalTrade
   class CurrencyConverter
     attr_reader :cached_conversion_rates, :cost, :exchange_data_file, :rates, :target_currency
-    attr_accessor :constituent_conversion_rates
 
     def initialize(exchange_data_file, target_currency)
       @target_currency = target_currency.upcase

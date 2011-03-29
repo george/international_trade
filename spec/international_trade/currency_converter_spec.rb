@@ -28,8 +28,6 @@ module InternationalTrade
   describe CurrencyConverter do
     def composite_conversion_rate(from_currency, target_currency, converter = nil)
       @converter = converter || CurrencyConverter.new('data/RATES.xml', target_currency)
-      # @converter.send(:parse_exchange_data_file)
-      @converter.constituent_conversion_rates = []
       @converter.send(:composite_conversion_rate, from_currency)
     end
 
