@@ -44,26 +44,17 @@ module InternationalTrade
     end
 
     def composite_conversion_rate(from_currency)
-      puts "=> from #{from_currency} (ultimately to: #{self.target_currency})"
-      puts "\tdomain:\n#{self.rates.map{|r| "\t\t#{r.from} => #{r.to}"}.join("\n")}"
-      # return BigDecimal('1.0', 15) if from_currency == self.target_currency
-
       if exact_match = self.rates.detect{ |r| r.from == from_currency && r.to == self.target_currency }
-        puts "\t!!! exact_match: #{exact_match.conversion.to_s('F')}"
         return exact_match.conversion
       end
 
       sub_domain = self.rates.find_all{ |r| r.from == from_currency }
 
-      puts "\t\tsub_domain:\n#{sub_domain.map{|r| "\t\t\t#{r.from} => #{r.to}"}.join("\n")}"
-
       sub_domain.each do |rate|
-        puts "\t>> looking at: #{rate.from} => #{rate.to}"
 
         self.rates.delete_if{ |r| r == rate || ( r.to == rate.from && r.from == rate.to ) } # no back-tracking
 
         if conversion = composite_conversion_rate(rate.to)
-          puts "\t!!! conversion match: #{rate.conversion.to_s('F')} (conversion: #{conversion.to_s('F')})"
           return ( conversion * rate.conversion )
           break
         end
