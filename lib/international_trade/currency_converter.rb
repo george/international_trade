@@ -10,7 +10,6 @@ module InternationalTrade
     def initialize(exchange_data_file, target_currency)
       @target_currency = target_currency.upcase
       @exchange_data_file = exchange_data_file
-      @rates = nil
       @cached_conversion_rates = {}
 
       parse_exchange_data_file
@@ -22,6 +21,8 @@ module InternationalTrade
       @cost = BigDecimal(@cost, 15)
 
       return BigDecimal(@cost.to_s, 15) if from_currency == self.target_currency
+
+      @rates = @all_rates.dup
 
       # shitty cache management
       conversion_rate = if cached_rate = self.cached_conversion_rates[from_currency.to_sym]
@@ -54,18 +55,18 @@ module InternationalTrade
 
         if conversion = composite_conversion_rate(rate.to)
           return ( conversion * rate.conversion )
-          break
+          # break
         end
       end
     end
 
     def parse_exchange_data_file
-      @rates = _parse_exchange_data_file
+      @all_rates = _parse_exchange_data_file
       post_process_conversion_rates
     end
 
     def post_process_conversion_rates
-      @rates = @rates.collect do |rate|
+      @all_rates.collect! do |rate|
         # Float-ify conversion rates for cleaner code (later)
         rate['conversion'] = BigDecimal(rate['conversion'], 15)
 
@@ -75,7 +76,7 @@ module InternationalTrade
       end
 
       # convert the conversions to OpenStructs, as they're nicer to work with
-      @rates = rates.collect{ |rate| OpenStruct.new(rate)}
+      @all_rates.collect!{ |rate| OpenStruct.new(rate)}
     end
 
     def _parse_exchange_data_file

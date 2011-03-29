@@ -3,7 +3,6 @@ require 'spec_helper'
 module InternationalTrade
   describe CurrencyConverter do
     def convert(target_currency, amount)
-      # CurrencyConverter.new('data/SAMPLE_RATES.xml', target_currency).convert(amount).to_s('F')
       CurrencyConverter.new('data/SAMPLE_RATES.xml', target_currency).convert(amount).to_s('F')
     end
 
@@ -22,12 +21,22 @@ module InternationalTrade
       it "returns '101.7 USD' given '100.0 AUD'" do
         convert('USD', '100 AUD').should == '101.7'
       end
+
+      # regression
+      it "properly converts AUD => USD after converting EUR => USD" do
+        converter = CurrencyConverter.new('data/RATES.xml', 'USD')
+
+        converter.convert('1.0 EUR').to_s('F').should == '1.37'
+        converter.convert('1.0 AUD').to_s('F').should == '1.02'
+      end
     end
   end
 
   describe CurrencyConverter do
     def composite_conversion_rate(from_currency, target_currency, converter = nil)
       @converter = converter || CurrencyConverter.new('data/RATES.xml', target_currency)
+
+      @converter.instance_variable_set(:@rates, @converter.instance_variable_get(:@all_rates))
       @converter.send(:composite_conversion_rate, from_currency)
     end
 

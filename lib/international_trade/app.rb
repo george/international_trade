@@ -76,7 +76,6 @@ module InternationalTrade
       display_usage_and_exit(e.message)
     end
 
-    # Setup the arguments
     def process_arguments
       process_transactions
       initialize_currency_converter
@@ -99,5 +98,3 @@ module InternationalTrade
     end
   end
 end
-
-# TO DO - Add your Modules, Classes, etc
