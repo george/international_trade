@@ -55,7 +55,6 @@ module InternationalTrade
 
         if conversion = composite_conversion_rate(rate.to)
           return ( conversion * rate.conversion )
-          # break
         end
       end
     end

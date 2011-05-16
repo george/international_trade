@@ -72,8 +72,6 @@ module InternationalTrade
     rescue Slop::InvalidOptionError => e
       _parse_options(false)
       display_usage_and_exit(e.message)
-    rescue Slop::MissingArgumentError => e
-      display_usage_and_exit(e.message)
     end
 
     def process_arguments
